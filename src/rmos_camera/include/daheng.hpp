@@ -10,16 +10,6 @@
 
 #include <opencv2/opencv.hpp>
 
-// #include "rclcpp/rclcpp.hpp"
-// #include "image_transport/image_transport.hpp"
-// #include "image_transport/publisher.hpp"
-// #include "sensor_msgs/msg/image.hpp"
-// #include "sensor_msgs/msg/camera_info.hpp"
-// #include "std_msgs/msg/int8.hpp"
-// #include "std_msgs/msg/int32.hpp"
-// #include "cv_bridge/cv_bridge.h"
-// #include "camera_info_manager/camera_info_manager.hpp"
-
 #include "driver/DxImageProc.h"
 #include "driver/GxIAPI.h"
 
@@ -71,7 +61,7 @@ typedef struct CamParamsStruct
 class DahengCamera
 {
 public:
-    DahengCamera();
+    DahengCamera(const std::string camer_sn);
     ~DahengCamera();
 
     bool SensorInit();
@@ -81,13 +71,22 @@ public:
 private:
     bool isOpen();
     bool isRun();
+    bool grapImage
 
     void setParams();
     void resetParams();
 
-
+private:
+    CamParamsStruct cam_params_;
+    bool is_open_;
+    bool is_run_;
+    bool is_init_;
     
-
+    GX_DEV_HANDLE device_;          // 设备权柄
+    PGX_FRAME_BUFFER pFrameBuffer_; // raw 图像的buffer
+    uint8_t *rgbImagebuf_;          // rgb 图像的buffer
+    std::string error_message_;     // 错误消息，对外传输
+    std::string camera_sn_;         // 相机sn号
 
 };
 
