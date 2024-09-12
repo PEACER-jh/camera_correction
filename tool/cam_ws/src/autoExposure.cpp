@@ -45,7 +45,7 @@ double AverageMetering(cv::Mat& hist, double ideal_brightness)
     double brightness = 0.0;
     
     for(int i = 0; i < 256; ++i)
-        brightness += hist.at<double>(i, 0) * i;
+        brightness += hist.at<double>(i) * i;
     double average_brightness = brightness / pixels;
     double adjustment_factor = ideal_brightness / average_brightness;
 

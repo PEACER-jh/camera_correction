@@ -8,7 +8,7 @@ int hist_w = 512;                                   // 直方图宽度
 int hist_h = 400;                                   // 直方图高度
 int bin_w = cvRound((double)hist_w / histSize);     // 直方图柱子宽度
 
-cv::Mat drawGrayHistogram(cv::Mat & img)
+cv::Mat drawGrayHistogram(cv::Mat & img, bool isRaw)
 {
     cv::Mat hist;
     cv::Mat src = img.clone();
@@ -23,12 +23,12 @@ cv::Mat drawGrayHistogram(cv::Mat & img)
                     cv::Scalar(255, 255, 255), 2, 8, 0);
     }
 
-    newWindows(isCombine);
-    showWindows(src, histImg, isCombine);
+    newWindows(isCombine, isRaw);
+    showWindows(src, histImg, isCombine, isRaw);
     return histImg;
 }
 
-cv::Mat drawColorHistogram(cv::Mat & img)
+cv::Mat drawColorHistogram(cv::Mat & img, bool isRaw)
 {
     cv::Mat histB, histG, histR;
     cv::Mat src = img.clone();
@@ -55,35 +55,56 @@ cv::Mat drawColorHistogram(cv::Mat & img)
                     cv::Scalar(0, 0, 255), 2, 8, 0);
     }
 
-    newWindows(isCombine);
-    showWindows(src, histImg, isCombine);
+    newWindows(isCombine, isRaw);
+    showWindows(src, histImg, isCombine, isRaw);
     return histImg;
 }
 
-void newWindows(bool isCombine)
+void newWindows(bool isCombine, bool isRaw)
 {
     if(isCombine)
-        cv::namedWindow(COMBINE_WINDOW, cv::WINDOW_NORMAL);  
+    {
+        if(isRaw)
+            cv::namedWindow(COMBINE_WINDOW_RAW, cv::WINDOW_NORMAL);  
+        else
+            cv::namedWindow(COMBINE_WINDOW_PRO, cv::WINDOW_NORMAL);
+    }
     else
     {
-        cv::namedWindow(IMAGE_WINDOW, cv::WINDOW_NORMAL);
-        cv::namedWindow(HIST_WINDOW, cv::WINDOW_NORMAL);
+        if(isRaw){
+            cv::namedWindow(IMAGE_WINDOW_RAW, cv::WINDOW_NORMAL);
+            cv::namedWindow(HIST_WINDOW_RAW, cv::WINDOW_NORMAL);
+        }
+        else{
+            cv::namedWindow(IMAGE_WINDOW_PRO, cv::WINDOW_NORMAL);
+            cv::namedWindow(HIST_WINDOW_PRO, cv::WINDOW_NORMAL);
+        }
     }
 }
 
-void showWindows(cv::Mat& img, cv::Mat& hist, bool isCombine)
+void showWindows(cv::Mat& img, cv::Mat& hist, bool isCombine, bool isRaw)
 {
     if(isCombine)
     {
         cv::Mat dst, canvas;
         cv::resize(img, dst, hist.size(), 0, 0, cv::INTER_AREA);
         cv::hconcat(dst, hist, canvas);
-        cv::imshow(COMBINE_WINDOW, canvas);
+        if(isRaw)
+            cv::imshow(COMBINE_WINDOW_RAW, canvas);
+        else
+            cv::imshow(COMBINE_WINDOW_PRO, canvas);
     }
     else
     {
-        cv::imshow(IMAGE_WINDOW, img);
-        cv::imshow(HIST_WINDOW, hist);
+        if(isRaw){
+            cv::imshow(IMAGE_WINDOW_RAW, img);
+            cv::imshow(HIST_WINDOW_RAW, hist);
+        }
+        else{
+            cv::imshow(IMAGE_WINDOW_PRO, img);
+            cv::imshow(HIST_WINDOW_PRO, hist);
+        }
+        
     }
     cv::waitKey(10);
 }

@@ -35,26 +35,30 @@ int main()
         cv::Mat dst(rows, cols, CV_8UC3);
         dst = frame.clone();
 
+        bool Raw = true;
         cv::Mat hist;
         if(GrayORColor == 0){
-            raw_thread = std::thread([&raw_promise, &dst]()
-                {raw_promise.set_value(drawGrayHistogram(dst));});
-            hist = raw_future.get();
+            // raw_thread = std::thread([&raw_promise, &dst]()
+            //     {raw_promise.set_value(drawGrayHistogram(dst));});
+            // hist = raw_future.get();
+            hist = drawGrayHistogram(dst, Raw);
         }
         else if(GrayORColor == 1){
-            raw_thread = std::thread([&raw_promise, &dst]()
-                {raw_promise.set_value(drawColorHistogram(dst));});
-            hist = raw_future.get();
+            // raw_thread = std::thread([&raw_promise, &dst]()
+            //     {raw_promise.set_value(drawColorHistogram(dst));});
+            // hist = raw_future.get();
+            hist = drawColorHistogram(dst, Raw);
         }
 
         // 自动曝光
         cv::Mat AE(dst.size(), CV_8UC3);
         AutoExposureMode mode = AutoExposureMode::AVERAGE_METERING;
         AE = autoExposure(dst, hist, mode);
-        pro_thread = std::thread([&AE](){drawGrayHistogram(AE);});
+        drawGrayHistogram(AE, !Raw);
+        // pro_thread = std::thread([&AE](){drawGrayHistogram(AE);});
         
-        raw_thread.join();
-        pro_thread.join();
+        // raw_thread.join();
+        // pro_thread.join();
     }
 
     cap.release();
