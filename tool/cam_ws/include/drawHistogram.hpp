@@ -12,6 +12,8 @@
 void newWindows(bool isCombine = true);                                 // 创建窗口
 void showWindows(cv::Mat& img, cv::Mat& hist, bool isCombine = true);   // 显示窗口
 
+void cameraCalibration(cv::Mat& frame); // 相机标定
+
 void drawColorHistogram(cv::Mat & img); // 绘制彩色直方图
 void drawGrayHistogram(cv::Mat & img);  // 绘制灰度直方图
 

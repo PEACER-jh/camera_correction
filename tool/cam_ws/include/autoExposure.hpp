@@ -16,7 +16,7 @@ enum class AutoExposureMode
 
 void autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode = AutoExposureMode::AVERAGE_METERING);
 
-void AverageMetering(cv::Mat& hist);
+double AverageMetering(cv::Mat& hist, double ideal_brightness = 128.0);
 void CenterWeightedMetering(cv::Mat& hist);
 void SpotMetering(cv::Mat& hist);
 void MatrixOrMultiZoneMetering(cv::Mat& hist);

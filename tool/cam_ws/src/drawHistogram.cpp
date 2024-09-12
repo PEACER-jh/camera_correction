@@ -85,3 +85,29 @@ void showWindows(cv::Mat& img, cv::Mat& hist, bool isCombine)
     }
     cv::waitKey(10);
 }
+
+void cameraCalibration(cv::Mat& frame)
+{
+    double k1 = -0.28340811, k2 = 0.07395907, p1 = 0.00019359, p2 = 1.76187114e-5;
+    double fx = 458.6540000, fy = 457.296000, cx = 367.251000, cy = 248.375000;
+
+    int rows = frame.rows;
+    int cols = frame.cols;
+
+    for(int v = 0; v < rows; ++v)
+        for(int u = 0; u < cols; ++u)
+        {
+            double x = (u - cx) / fx;
+            double y = (v - cy) / fy;
+            double r = std::sqrt(x * x + y * y);
+            double xd = x * (1 + k1 * r * r + k2 * r * r * r * r) + 2 * p1 * x * y + p2 * (r * r + 2 * x * x);
+            double yd = y * (1 + k1 * r * r + k2 * r * r * r * r) + p1 * (r * r + 2 * y * y) + 2 * p2 * x * y;
+            int ud = fx * xd + cx;
+            int vd = fy * yd + cy;
+
+            if(ud >= 0 && vd >= 0 && ud < cols && vd < rows)
+                frame.at<uchar>(v, u) = frame.at<uchar>((int)vd, (int)ud);
+            else
+                frame.at<uchar>(v, u) = 0;
+        }
+}
