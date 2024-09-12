@@ -8,7 +8,7 @@ int hist_w = 512;                                   // 直方图宽度
 int hist_h = 400;                                   // 直方图高度
 int bin_w = cvRound((double)hist_w / histSize);     // 直方图柱子宽度
 
-void drawGrayHistogram(cv::Mat & img)
+cv::Mat drawGrayHistogram(cv::Mat & img)
 {
     cv::Mat hist;
     cv::Mat src = img.clone();
@@ -25,9 +25,10 @@ void drawGrayHistogram(cv::Mat & img)
 
     newWindows(isCombine);
     showWindows(src, histImg, isCombine);
+    return histImg;
 }
 
-void drawColorHistogram(cv::Mat & img)
+cv::Mat drawColorHistogram(cv::Mat & img)
 {
     cv::Mat histB, histG, histR;
     cv::Mat src = img.clone();
@@ -56,6 +57,7 @@ void drawColorHistogram(cv::Mat & img)
 
     newWindows(isCombine);
     showWindows(src, histImg, isCombine);
+    return histImg;
 }
 
 void newWindows(bool isCombine)

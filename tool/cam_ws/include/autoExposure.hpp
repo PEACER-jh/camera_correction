@@ -7,19 +7,19 @@
 
 enum class AutoExposureMode
 {
-    AVERAGE_METERING,
-    CENTER_WEIGHTED_METERING,
-    SPOT_METERING,
-    MATRIX_OR_MULTI_ZONE_METERING,
-    DYNAMIC_RANGE_OPTIMIZATION,
+    AVERAGE_METERING,               // 平均测光
+    CENTER_WEIGHTED_METERING,       // 中心加权测光
+    SPOT_METERING,                  // 点测光
+    MATRIX_OR_MULTI_ZONE_METERING,  // 矩阵测光或多区域测光
+    DYNAMIC_RANGE_OPTIMIZATION,     // 动态范围优化
 };
 
-void autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode = AutoExposureMode::AVERAGE_METERING);
+cv::Mat autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode = AutoExposureMode::AVERAGE_METERING);
 
 double AverageMetering(cv::Mat& hist, double ideal_brightness = 128.0);
-void CenterWeightedMetering(cv::Mat& hist);
-void SpotMetering(cv::Mat& hist);
-void MatrixOrMultiZoneMetering(cv::Mat& hist);
-void DynamicRangeOptimization(cv::Mat& hist);
+// double CenterWeightedMetering(cv::Mat& hist, double ideal_brightness = 128.0);
+// double SpotMetering(cv::Mat& hist, double ideal_brightness = 128.0);
+// double MatrixOrMultiZoneMetering(cv::Mat& hist, double ideal_brightness = 128.0);
+// double DynamicRangeOptimization(cv::Mat& hist, double ideal_brightness = 128.0);
 
 #endif // AUTO_EXPOSURE_HPP

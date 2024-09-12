@@ -14,7 +14,7 @@ void showWindows(cv::Mat& img, cv::Mat& hist, bool isCombine = true);   // 显�
 
 void cameraCalibration(cv::Mat& frame); // 相机标定
 
-void drawColorHistogram(cv::Mat & img); // 绘制彩色直方图
-void drawGrayHistogram(cv::Mat & img);  // 绘制灰度直方图
+cv::Mat drawColorHistogram(cv::Mat & img); // 绘制彩色直方图
+cv::Mat drawGrayHistogram(cv::Mat & img);  // 绘制灰度直方图
 
 #endif // DRAW_HISTOGRAM_HPP

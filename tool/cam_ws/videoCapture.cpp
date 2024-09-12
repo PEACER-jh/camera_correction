@@ -1,8 +1,11 @@
 #include <cmath>
+#include <future>
+#include <thread>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
 #include "./include/drawHistogram.hpp"
+#include "./include/autoExposure.hpp"
 
 int main()
 {
@@ -13,8 +16,13 @@ int main()
         return -1;
     }
 
+    std::thread raw_thread ,pro_thread;
+    std::promise<cv::Mat> raw_promise, pro_promise;
+    std::future<cv::Mat> raw_future = raw_promise.get_future();
+    std::future<cv::Mat> pro_future = pro_promise.get_future();
+
     cv::Mat frame;
-    bool GrayORColor = 1; // 0 for gray, 1 for color
+    bool GrayORColor = 0; // 0 for gray, 1 for color
     while(cap.isOpened())
     {
         cap >> frame;
@@ -28,16 +36,25 @@ int main()
         dst = frame.clone();
 
         cv::Mat hist;
-        if(GrayORColor == 0)
-        {
-
-            drawGrayHistogram(dst);
+        if(GrayORColor == 0){
+            raw_thread = std::thread([&raw_promise, &dst]()
+                {raw_promise.set_value(drawGrayHistogram(dst));});
+            hist = raw_future.get();
         }
-        else if(GrayORColor == 1)
-        {
-
-            drawColorHistogram(dst);
+        else if(GrayORColor == 1){
+            raw_thread = std::thread([&raw_promise, &dst]()
+                {raw_promise.set_value(drawColorHistogram(dst));});
+            hist = raw_future.get();
         }
+
+        // 自动曝光
+        cv::Mat AE(dst.size(), CV_8UC3);
+        AutoExposureMode mode = AutoExposureMode::AVERAGE_METERING;
+        AE = autoExposure(dst, hist, mode);
+        pro_thread = std::thread([&AE](){drawGrayHistogram(AE);});
+        
+        raw_thread.join();
+        pro_thread.join();
     }
 
     cap.release();
