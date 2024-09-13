@@ -9,8 +9,8 @@ cv::Mat autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode)
         gray = src.clone();
 
     double ideal = 64.0;
-    double weight = 0.8;
-    double factor;
+    double weight = 5.0;
+    double factor = 1.0;
     switch(mode)
     {
         case AutoExposureMode::AVERAGE_METERING:
@@ -57,19 +57,21 @@ double CenterWeightedMetering(cv::Mat& src, double ideal_brightness, double cent
     int rows = src.rows;
     int cols = src.cols;
 
-    cv::Mat weightMat = cv::Mat::ones(rows, cols, CV_32FC1);
-    cv::Point2i center(cols / 2, rows / 2);
+    cv::Mat weightMat = cv::Mat::zeros(rows, cols, CV_32FC1);
+    cv::Point2f center(cols / 2.0, rows / 2.0);
     double radius = std::sqrt(center.x * center.x + center.y * center.y);
 
     for(int v = 0; v < rows; ++v)
         for(int u = 0; u < cols; ++u)
         {
             double distance = std::sqrt(std::pow(u - center.x, 2) + std::pow(v - center.y, 2));
-            weightMat.at<double>(v, u) = center_weight * (1.0 - distance / radius);
+            weightMat.at<float>(v, u) = center_weight * (1.0 - distance / radius);
         }
 
-    cv::Mat dst(src.size(), CV_8UC1);
-    cv::multiply(src, weightMat, dst);
+    cv::Mat img;
+    cv::Mat dst(src.size(), CV_32FC1);
+    src.convertTo(img, CV_32FC1);
+    cv::multiply(img, weightMat, dst);
     double weighted_average_brightness = cv::mean(dst)[0];
     double adjustment_factor = ideal_brightness / weighted_average_brightness;
 

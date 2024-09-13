@@ -18,10 +18,10 @@ int main()
         return -1;
     }
 
-    std::thread raw_thread ,pro_thread;
-    std::promise<cv::Mat> raw_promise, pro_promise;
-    std::future<cv::Mat> raw_future = raw_promise.get_future();
-    std::future<cv::Mat> pro_future = pro_promise.get_future();
+    // std::thread raw_thread ,pro_thread;
+    // std::promise<cv::Mat> raw_promise, pro_promise;
+    // std::future<cv::Mat> raw_future = raw_promise.get_future();
+    // std::future<cv::Mat> pro_future = pro_promise.get_future();
 
     cv::Mat frame;
     bool GrayORColor = 0; // 0 for gray, 1 for color
@@ -60,6 +60,7 @@ int main()
         AE = autoExposure(dst, hist, mode);
         std::chrono::duration<double> costAE = std::chrono::steady_clock::now() - currAE;
         std::cout << "auto exposure cost: " << 1.0 / costAE.count() << " fps" << std::endl;
+        // drawColorHistogram(AE, !Raw);
         drawGrayHistogram(AE, !Raw);
         // pro_thread = std::thread([&AE](){drawGrayHistogram(AE);});
         
