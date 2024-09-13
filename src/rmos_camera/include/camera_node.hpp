@@ -11,8 +11,24 @@
 #include "cv_bridge/cv_bridge.h"
 #include "camera_info_manager/camera_info_manager.hpp"
 
+#include "rmos_interfaces/msg/CameraInfo.msg"
+#include "daheng.hpp"
+
 namespace rmos_sensor
 {
+
+class CameraNode : public rclcpp::Node
+{
+public:
+    CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options);
+    ~CameraNode();
+
+
+
+};
+
+
+
 
 }
 
