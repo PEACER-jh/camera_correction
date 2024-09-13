@@ -222,8 +222,18 @@ bool DahengCamera::SensorShut()
     return true;
 }
 
+bool DahengCamera::AutoExposure(double exposure_factor)
+{
+    if(!cam_params_.auto_exposure){
+        return false;
+    }
+}
 
-
-
+bool DahengCamera::AutoWhiteBalance(std::vector<double> white_balance_factor)
+{
+    if(cam_params_.auto_white_balance){
+        return false;
+    }
+}
 
 }

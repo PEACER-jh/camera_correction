@@ -6,7 +6,8 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
-#include <unordered_map>
+#include <iostream>
+#include <vector>
 
 #include <opencv2/opencv.hpp>
 
@@ -75,13 +76,13 @@ public:
     bool SensorShut();
 
 public: 
-    bool AutoExposure();
-    bool AutoWhiteBalance();
+    bool AutoExposure(double exposure_factor);
+    bool AutoWhiteBalance(std::vector<double> white_balance_factor);
 
     template<typename T>
-    bool SetParam(CamParamsEnum param, T value);
+    bool SetParam(CamParamsEnum type, T value) {return false;}
     template<typename T>
-    bool GetParam(CamParamsEnum param, T &value);
+    bool GetParam(CamParamsEnum type, T &value) {return false;}
 
 private:
     bool isOpen();
