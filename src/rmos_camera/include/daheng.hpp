@@ -20,7 +20,6 @@ namespace rmos_camera
 #define ACQ_TRANSFER_NUMBER_URB 64
 #define ACQ_BUFFER_NUM 3
 
-
 enum class CamParamsEnum
 {
     Width,                  // 图像宽度
