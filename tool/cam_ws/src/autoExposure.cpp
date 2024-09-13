@@ -43,13 +43,21 @@ double AverageMetering(cv::Mat& hist, double ideal_brightness)
     int cols = hist.cols;
     double pixels = rows * cols;
     double brightness = 0.0;
+
+    cv::namedWindow("DEBUG: histogram", cv::WINDOW_NORMAL);
+    cv::imshow("DEBUG: histogram", hist);
     
     for(int i = 0; i < 256; ++i)
         brightness += hist.at<double>(i) * i;
     double average_brightness = brightness / pixels;
     double adjustment_factor = ideal_brightness / average_brightness;
 
+    std::cout << "*********************************************" << std::endl;
+    std::cout << "total brightness of image: " << brightness << std::endl;
     std::cout << "average brightness of image: " << average_brightness << std::endl;
+    std::cout << "adjustment factor of image: " << adjustment_factor << std::endl;
+    std::cout << "*********************************************" << std::endl;
+
     return adjustment_factor;
 }
 

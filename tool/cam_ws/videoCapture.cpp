@@ -3,6 +3,7 @@
 #include <thread>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 
 #include "./include/drawHistogram.hpp"
 #include "./include/autoExposure.hpp"
@@ -32,7 +33,8 @@ int main()
         }
         int rows = frame.rows;
         int cols = frame.cols;
-        cv::Mat dst(rows, cols, CV_8UC3);
+        cv::Mat src(rows, cols, CV_8UC3) ,dst(rows, cols, CV_8UC3);
+        src = frame.clone();
         dst = frame.clone();
 
         bool Raw = true;
@@ -41,13 +43,13 @@ int main()
             // raw_thread = std::thread([&raw_promise, &dst]()
             //     {raw_promise.set_value(drawGrayHistogram(dst));});
             // hist = raw_future.get();
-            hist = drawGrayHistogram(dst, Raw);
+            hist = drawGrayHistogram(src, Raw);
         }
         else if(GrayORColor == 1){
             // raw_thread = std::thread([&raw_promise, &dst]()
             //     {raw_promise.set_value(drawColorHistogram(dst));});
             // hist = raw_future.get();
-            hist = drawColorHistogram(dst, Raw);
+            hist = drawColorHistogram(src, Raw);
         }
 
         // 自动曝光

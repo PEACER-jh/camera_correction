@@ -10,7 +10,7 @@ int bin_w = cvRound((double)hist_w / histSize);     // 直方图柱子宽度
 
 cv::Mat drawGrayHistogram(cv::Mat & img, bool isRaw)
 {
-    cv::Mat hist;
+    cv::Mat hist, hist_norm;
     cv::Mat src = img.clone();
     cv::cvtColor(src, src, cv::COLOR_BGR2GRAY);
 
@@ -25,7 +25,8 @@ cv::Mat drawGrayHistogram(cv::Mat & img, bool isRaw)
 
     newWindows(isCombine, isRaw);
     showWindows(src, histImg, isCombine, isRaw);
-    return histImg;
+    return hist;
+    // return histImg;
 }
 
 cv::Mat drawColorHistogram(cv::Mat & img, bool isRaw)
@@ -58,6 +59,7 @@ cv::Mat drawColorHistogram(cv::Mat & img, bool isRaw)
     newWindows(isCombine, isRaw);
     showWindows(src, histImg, isCombine, isRaw);
     return histImg;
+
 }
 
 void newWindows(bool isCombine, bool isRaw)
