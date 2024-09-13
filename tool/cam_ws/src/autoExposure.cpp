@@ -8,7 +8,7 @@ cv::Mat autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode)
     else
         gray = src.clone();
 
-    double ideal = 64.0;
+    double ideal = 100.0;
     double weight = 5.0;
     double factor = 1.0;
     switch(mode)

@@ -24,7 +24,7 @@ int main()
     // std::future<cv::Mat> pro_future = pro_promise.get_future();
 
     cv::Mat frame;
-    bool GrayORColor = 0; // 0 for gray, 1 for color
+    bool GrayORColor = 1; // 0 for gray, 1 for color
     while(cap.isOpened())
     {
         cap >> frame;
@@ -60,8 +60,8 @@ int main()
         AE = autoExposure(dst, hist, mode);
         std::chrono::duration<double> costAE = std::chrono::steady_clock::now() - currAE;
         std::cout << "auto exposure cost: " << 1.0 / costAE.count() << " fps" << std::endl;
-        // drawColorHistogram(AE, !Raw);
-        drawGrayHistogram(AE, !Raw);
+        drawColorHistogram(AE, !Raw);
+        // drawGrayHistogram(AE, !Raw);
         // pro_thread = std::thread([&AE](){drawGrayHistogram(AE);});
         
         // raw_thread.join();
