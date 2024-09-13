@@ -16,10 +16,10 @@ enum class AutoExposureMode
 
 cv::Mat autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode = AutoExposureMode::AVERAGE_METERING);
 
-double AverageMetering(cv::Mat& hist, double ideal_brightness = 128.0);
-// double CenterWeightedMetering(cv::Mat& hist, double ideal_brightness = 128.0);
-// double SpotMetering(cv::Mat& hist, double ideal_brightness = 128.0);
-// double MatrixOrMultiZoneMetering(cv::Mat& hist, double ideal_brightness = 128.0);
-// double DynamicRangeOptimization(cv::Mat& hist, double ideal_brightness = 128.0);
+double AverageMetering(cv::Mat& src, double ideal_brightness = 128.0);
+double CenterWeightedMetering(cv::Mat& src, double ideal_brightness = 128.0, double center_weight = 0.5);
+// double SpotMetering(cv::Mat& src, double ideal_brightness = 128.0);
+// double MatrixOrMultiZoneMetering(cv::Mat& src, double ideal_brightness = 128.0);
+// double DynamicRangeOptimization(cv::Mat& src, double ideal_brightness = 128.0);
 
 #endif // AUTO_EXPOSURE_HPP

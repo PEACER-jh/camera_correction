@@ -8,16 +8,17 @@ cv::Mat autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode)
     else
         gray = src.clone();
 
-    double ideal = 128.0;
+    double ideal = 64.0;
+    double weight = 0.8;
     double factor;
     switch(mode)
     {
         case AutoExposureMode::AVERAGE_METERING:
-            factor = AverageMetering(hist, ideal);
+            factor = AverageMetering(gray, ideal);
             break;
-        // case AutoExposureMode::CENTER_WEIGHTED_METERING:
-        //     CenterWeightedMetering(hist, ideal);
-        //     break;
+        case AutoExposureMode::CENTER_WEIGHTED_METERING:
+            factor = CenterWeightedMetering(gray, ideal, weight);
+            break;
         // case AutoExposureMode::SPOT_METERING:
         //     SpotMetering(hist);
         //     break;
@@ -37,23 +38,13 @@ cv::Mat autoExposure(cv::Mat& src, cv::Mat& hist, AutoExposureMode mode)
     return ae_img;
 }
 
-double AverageMetering(cv::Mat& hist, double ideal_brightness)
+double AverageMetering(cv::Mat& src, double ideal_brightness)
 {
-    int rows = hist.rows;
-    int cols = hist.cols;
-    double pixels = rows * cols;
-    double brightness = 0.0;
-
-    cv::namedWindow("DEBUG: histogram", cv::WINDOW_NORMAL);
-    cv::imshow("DEBUG: histogram", hist);
-    
-    for(int i = 0; i < 256; ++i)
-        brightness += hist.at<double>(i) * i;
-    double average_brightness = brightness / pixels;
+    double average_brightness = cv::mean(src)[0];
     double adjustment_factor = ideal_brightness / average_brightness;
 
     std::cout << "*********************************************" << std::endl;
-    std::cout << "total brightness of image: " << brightness << std::endl;
+    std::cout << "AE: AVERAGE METERING" << std::endl;
     std::cout << "average brightness of image: " << average_brightness << std::endl;
     std::cout << "adjustment factor of image: " << adjustment_factor << std::endl;
     std::cout << "*********************************************" << std::endl;
@@ -61,7 +52,39 @@ double AverageMetering(cv::Mat& hist, double ideal_brightness)
     return adjustment_factor;
 }
 
-// double CenterWeightedMetering(cv::Mat& hist, double ideal_brightness = 128.0) {}
-// double SpotMetering(cv::Mat& hist, double ideal_brightness = 128.0) {}
-// double MatrixOrMultiZoneMetering(cv::Mat& hist, double ideal_brightness = 128.0) {}
-// double DynamicRangeOptimization(cv::Mat& hist, double ideal_brightness = 128.0) {}
+double CenterWeightedMetering(cv::Mat& src, double ideal_brightness, double center_weight) 
+{
+    int rows = src.rows;
+    int cols = src.cols;
+
+    cv::Mat weightMat = cv::Mat::ones(rows, cols, CV_32FC1);
+    cv::Point2i center(cols / 2, rows / 2);
+    double radius = std::sqrt(center.x * center.x + center.y * center.y);
+
+    for(int v = 0; v < rows; ++v)
+        for(int u = 0; u < cols; ++u)
+        {
+            double distance = std::sqrt(std::pow(u - center.x, 2) + std::pow(v - center.y, 2));
+            weightMat.at<double>(v, u) = center_weight * (1.0 - distance / radius);
+        }
+
+    cv::Mat dst(src.size(), CV_8UC1);
+    cv::multiply(src, weightMat, dst);
+    double weighted_average_brightness = cv::mean(dst)[0];
+    double adjustment_factor = ideal_brightness / weighted_average_brightness;
+
+    std::cout << "*********************************************" << std::endl;
+    std::cout << "AE: CENTER WEIGHTED METERING" << std::endl;
+    std::cout << "average brightness of image: " << weighted_average_brightness << std::endl;
+    std::cout << "adjustment factor of image: " << adjustment_factor << std::endl;
+    std::cout << "*********************************************" << std::endl;
+
+    return adjustment_factor;
+}
+
+
+
+
+// double SpotMetering(cv::Mat& src, double ideal_brightness = 128.0) {}
+// double MatrixOrMultiZoneMetering(cv::Mat& src, double ideal_brightness = 128.0) {}
+// double DynamicRangeOptimization(cv::Mat& src, double ideal_brightness = 128.0) {}

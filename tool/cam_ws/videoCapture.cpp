@@ -1,6 +1,7 @@
 #include <cmath>
 #include <future>
 #include <thread>
+#include <chrono>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
@@ -54,8 +55,11 @@ int main()
 
         // 自动曝光
         cv::Mat AE(dst.size(), CV_8UC3);
-        AutoExposureMode mode = AutoExposureMode::AVERAGE_METERING;
+        AutoExposureMode mode = AutoExposureMode::CENTER_WEIGHTED_METERING;
+        auto currAE = std::chrono::steady_clock::now();
         AE = autoExposure(dst, hist, mode);
+        std::chrono::duration<double> costAE = std::chrono::steady_clock::now() - currAE;
+        std::cout << "auto exposure cost: " << 1.0 / costAE.count() << " fps" << std::endl;
         drawGrayHistogram(AE, !Raw);
         // pro_thread = std::thread([&AE](){drawGrayHistogram(AE);});
         
