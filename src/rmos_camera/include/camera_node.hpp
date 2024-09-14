@@ -40,6 +40,7 @@ private:
     
     cv::Mat image_;
     uint32_t frame_id_;
+    int time_offset;
     std::thread capture_thread_;
     std::shared_ptr<rmos_camera::DahengCamera> camera_;
     std::unique_ptr<camera_info_manager::CameraInfoManager> cam_info_manager_;  
