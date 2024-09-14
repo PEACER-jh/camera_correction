@@ -46,11 +46,30 @@ CameraNode::CameraNode(const std::string & node_name, const rclcpp::NodeOptions 
         camera_info_ = cam_info_manager_->getCameraInfo();
     }
 
+    camera_info_pub_ = this->create_publisher<sensor_msgs::msg::CameraInfo>("/camera/info", 10);
+    callback_handle_ = this->add_on_set_parameters_callback
+                (std::bind(&CameraNode::ParamtersCallBack, this, std::placeholders::_1));
+
 
 
 }
 
-
+void CameraNode::capture_thread_lambda()
+{
+    while(rclcpp::ok())
+    {
+        if(!this->camera_->is_open_)
+        {
+            RCLCPP_WARN(this->get_logger(), "camera is not open ");
+            this->camera_->SensorOpen();
+        }
+        if(this->camera_->SensorRun(this->image_))
+        {
+            this->img_msg_ = cv_bridge::CvImage(std_msgs::msg::Header(), "bgr8", image_).toImageMsg();
+            
+        }
+    }
+}
 
 
 

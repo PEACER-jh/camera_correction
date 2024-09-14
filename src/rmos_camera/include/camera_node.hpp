@@ -6,6 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <functional>
 
 #include "rclcpp/rclcpp.hpp"
 #include "image_transport/image_transport.hpp"
@@ -49,12 +50,10 @@ public:
     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
 
 private:
+    void capture_thread_lambda();
     void AutoExposureCallBack(rmos_interfaces::msg::CameraInfo::SharedPtr info);
 
 };
-
-
-
 
 }
 

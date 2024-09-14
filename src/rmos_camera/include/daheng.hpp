@@ -80,7 +80,7 @@ private:
     bool isInit();
     bool isRun();
 
-private:
+public:
     bool is_open_;
     bool is_init_;
     bool is_run_;
