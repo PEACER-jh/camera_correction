@@ -23,7 +23,7 @@
 #include "rmos_interfaces/srv/camera_info.hpp"
 #include "daheng.hpp"
 
-namespace rmos_sensor
+namespace rmos_camera
 {
 
 class CameraNode : public rclcpp::Node

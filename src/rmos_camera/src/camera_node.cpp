@@ -1,7 +1,7 @@
 #include "include/camera_node.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
-namespace rmos_sensor
+namespace rmos_camera
 {
 CameraNode::CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options) : 
     rclcpp::Node("daheng_camera", options),
@@ -150,6 +150,7 @@ void CameraNode::AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv
 
 }
 
-
-
 } // namespace rmos_camera
+
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(rmos_camera::CameraNode)
