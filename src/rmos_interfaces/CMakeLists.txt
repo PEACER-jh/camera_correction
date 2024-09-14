@@ -17,6 +17,7 @@ find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CameraInfo.msg"
+  "srv/CameraInfo.srv"
   DEPENDENCIES)
 
 if(BUILD_TESTING)
