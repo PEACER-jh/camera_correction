@@ -5,22 +5,21 @@ namespace rmos_camera
 DahengCamera::DahengCamera(const std::string camer_sn) :
     camera_sn_(camer_sn), device_(nullptr), pFrameBuffer_(nullptr)
 {
-    this->cam_params_.height = 1200;
     this->cam_params_.width  = 1920;
+    this->cam_params_.height = 1200;
     this->cam_params_.auto_exposure = false;
     this->cam_params_.exposure = 1000;
-    this->cam_params_.brightness = 0;
+    this->cam_params_.brightness = 0.0;
     this->cam_params_.auto_white_balance = false;
-    this->cam_params_.white_balance = 0;
-    this->cam_params_.gain = 0;
+    this->cam_params_.white_balance = 0.0;
+    this->cam_params_.gain = 0.0;
     this->cam_params_.r_gain = 19.8;
     this->cam_params_.g_gain = 19.8;
     this->cam_params_.b_gain = 19.8;
-    this->cam_params_.gamma = 0;
-    this->cam_params_.contrast = 0;
-    this->cam_params_.hue = 0;
-    this->cam_params_.saturation = 0;
-    this->cam_params_.hue = 0;
+    this->cam_params_.gamma = 0.0;
+    this->cam_params_.contrast = 0.0;
+    this->cam_params_.saturation = 0.0;
+    this->cam_params_.hue = 0.0;
     this->cam_params_.fps = 100;
 
     this->is_open_ = false;

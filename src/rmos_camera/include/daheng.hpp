@@ -1,12 +1,8 @@
 #ifndef RMOS_DAHENG_HPP
 #define RMOS_DAHENG_HPP
 
-#include <string>
-#include <memory>
-#include <thread>
-#include <mutex>
-#include <chrono>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
@@ -75,13 +71,9 @@ public:
     bool SensorShut();
 
 public: 
+    CamParamsStruct cam_params_;
     bool AutoExposure(double exposure_factor);
     bool AutoWhiteBalance(std::vector<double> white_balance_factor);
-
-    template<typename T>
-    bool SetParam(CamParamsEnum type, T value) {return false;}
-    template<typename T>
-    bool GetParam(CamParamsEnum type, T &value) {return false;}
 
 private:
     bool isOpen();
@@ -89,7 +81,6 @@ private:
     bool isRun();
 
 private:
-    CamParamsStruct cam_params_;
     bool is_open_;
     bool is_init_;
     bool is_run_;
@@ -99,6 +90,107 @@ private:
     uint8_t *rgbImagebuf_;          // rgb 图像的buffer
     std::string error_message_;     // 错误消息，对外传输
     std::string camera_sn_;         // 相机sn号
+
+public:
+    template<typename T>
+    T GetParam(CamParamsEnum type, T & value) 
+    {
+        switch(type)
+        {
+            case CamParamsEnum::Width :
+            {
+                value = this->cam_params_.width;
+                return this->cam_params_.width;
+            }
+            case CamParamsEnum::Height : 
+            {
+                value = this->cam_params_.height;
+                return this->cam_params_.height;
+            }
+            case CamParamsEnum::AutoExposure : 
+            {
+                value = this->cam_params_.auto_exposure;
+                return this->cam_params_.auto_exposure;
+            }
+            case CamParamsEnum::Exposure : 
+            {
+                value = this->cam_params_.exposure;
+                return this->cam_params_.exposure;
+            }
+            case CamParamsEnum::AutoWhiteBalance : 
+            {
+                value = this->cam_params_.auto_white_balance;
+                return this->cam_params_.auto_white_balance;
+            }
+            case CamParamsEnum::Gain :
+            {
+                value = this->cam_params_.gain;
+                return this->cam_params_.gain;
+            }
+            case CamParamsEnum::RGain :
+            {
+                value = this->cam_params_.r_gain;
+                return this->cam_params_.r_gain;
+            }
+            case CamParamsEnum::GGain :
+            {
+                value = this->cam_params_.g_gain;
+                return this->cam_params_.g_gain;
+            }
+            case CamParamsEnum::BGain :
+            {
+                value = this->cam_params_.b_gain;
+                return this->cam_params_.b_gain;
+            }
+            case CamParamsEnum::Gamma : 
+            {
+                value = this->cam_params_.gamma;
+                return this->cam_params_.gamma;
+            }
+            default : 
+            {
+                this->error_message_ = "get camera param error ";
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    template<typename T>
+    bool SetParam(CamParamsEnum type, T value) 
+    {
+        switch(type)
+        {
+            case CamParamsEnum::Exposure :
+            {
+                status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, this->cam_params_.exposure - 200);
+                status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, this->cam_params_.exposure + 200);
+                status = GXSetFloat(device_, GX_FLOAT_EXPOSURE_TIME, this->cam_params_.exposure);
+                return true;
+            }
+            case CamParamsEnum::Gain :
+            case CamParamsEnum::RGain :
+            case CamParamsEnum::GGain :
+            case CamParamsEnum::BGain :
+            {
+                status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_RED);
+                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, this->cam_params_.r_gain / 10.0);
+                status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_GREEN);
+                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, this->cam_params_.g_gain / 10.0);
+                status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_BLUE);
+                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, this->cam_params_.b_gain / 10.0);
+                return true;
+            }
+            default :
+            {
+                this->error_message_ = "set camera param error ";
+                return false;
+            }
+        }
+
+        return false;
+    }
 
 };
 
