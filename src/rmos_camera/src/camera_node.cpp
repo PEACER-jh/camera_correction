@@ -10,6 +10,8 @@ CameraNode::CameraNode(const std::string & node_name, const rclcpp::NodeOptions 
 {
     RCLCPP_INFO(this->get_logger(), "Starting node [%s]", node_name.c_str());
 
+    this->time_offset = this->declare_parameter<int>("/camera/time_offset", 0);
+
     camera_->cam_params_.width = this->declare_parameter<size_t>("/camera/width", 1920);
     camera_->cam_params_.height =  this->declare_parameter<size_t>("/camera/height", 1200);
     camera_->cam_params_.auto_exposure = this->declare_parameter<bool>("/camera/auto_exposure", false);
@@ -35,6 +37,7 @@ CameraNode::CameraNode(const std::string & node_name, const rclcpp::NodeOptions 
     camera_info_msg_.green_gain = camera_->cam_params_.g_gain;
     camera_info_msg_.blue_gain = camera_->cam_params_.b_gain;
 
+
     bool is_open = camera_->SensorOpen();
     
     cam_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(this, "DahengCam");
@@ -48,6 +51,9 @@ CameraNode::CameraNode(const std::string & node_name, const rclcpp::NodeOptions 
 
     img_pub_ = image_transport::create_camera_publisher(this, "/image_raw", rmw_qos_profile_default);
     camera_info_pub_ = this->create_publisher<sensor_msgs::msg::CameraInfo>("/camera/info", 10);
+    camera_exp_info_srv_ = this->create_service<rmos_interfaces::srv::CameraInfo>
+                ("/camera/exposure_info", std::bind(&CameraNode::AutoExposureCallBack, this, std::placeholders::_1, std::placeholders::_2));
+
     capture_thread_ = std::thread{[this]()->void {this->capture_thread_lambda();}};
     callback_handle_ = this->add_on_set_parameters_callback
                 (std::bind(&CameraNode::ParamtersCallBack, this, std::placeholders::_1));
@@ -92,10 +98,58 @@ void CameraNode::capture_thread_lambda()
     }
 }
 
-rcl_interfaces::msg::SetParametersResult
+rcl_interfaces::msg::SetParametersResult CameraNode::ParamtersCallBack(const std::vector<rclcpp::Parameter> & parameters)
+{
+    rcl_interfaces::msg::SetParametersResult result;
+    result.successful = true;
+    result.reason = "success";
+    
+    for(const auto &param : parameters)
+    {
+        RCLCPP_INFO(this->get_logger(), "%s", param.get_name().c_str());
+        RCLCPP_INFO(this->get_logger(), "%s", param.get_type_name().c_str());
+        RCLCPP_INFO(this->get_logger(), "%s", param.value_to_string().c_str());
+
+        if(param.get_name() == "time_offset") {
+            this->time_offset = param.as_int();
+        } else {
+            RCLCPP_WARN(this->get_logger(), "unknown or unchange parameter %s", param.get_name().c_str());
+        }
+    }
+
+    return result;
+}
+
+void CameraNode::AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv::CameraInfo::Request> request,
+                                            std::shared_ptr<rmos_interfaces::srv::CameraInfo::Response> response)
+{
+    this->camera_->cam_params_.auto_exposure = request->info.auto_exposure;
+    this->camera_->cam_params_.auto_white_balance = request->info.auto_white_balance;
+
+    if(!request->info.auto_exposure && !request->info.auto_white_balance)
+    {
+        RCLCPP_INFO(this->get_logger(), "auto exposure and white balance are both off");
+        return;
+    }
 
 
-
-
+    if(request->info.auto_exposure)
+    {
+        this->camera_->cam_params_.exposure = request->info.exposure;
+        this->camera_->SetParam(rmos_camera::CamParamsEnum::Exposure, this->camera_->cam_params_.exposure);
+    }
+    if(request->info.auto_white_balance)
+    {
+        this->camera_->cam_params_.r_gain = request->info.red_gain;
+        this->camera_->cam_params_.g_gain = request->info.green_gain;
+        this->camera_->cam_params_.b_gain = request->info.blue_gain;
+        this->camera_->SetParam(rmos_camera::CamParamsEnum::RGain, this->camera_->cam_params_.r_gain);
+        this->camera_->SetParam(rmos_camera::CamParamsEnum::GGain, this->camera_->cam_params_.g_gain);
+        this->camera_->SetParam(rmos_camera::CamParamsEnum::BGain, this->camera_->cam_params_.b_gain);
+    }
 
 }
+
+
+
+} // namespace rmos_camera

@@ -164,22 +164,27 @@ public:
         {
             case CamParamsEnum::Exposure :
             {
-                status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, this->cam_params_.exposure - 200);
-                status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, this->cam_params_.exposure + 200);
-                status = GXSetFloat(device_, GX_FLOAT_EXPOSURE_TIME, this->cam_params_.exposure);
+                status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, value - 200);
+                status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, value + 200);
+                status = GXSetFloat(device_, GX_FLOAT_EXPOSURE_TIME, value);
                 return true;
             }
-            case CamParamsEnum::Gain :
             case CamParamsEnum::RGain :
-            case CamParamsEnum::GGain :
-            case CamParamsEnum::BGain :
             {
                 status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_RED);
-                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, this->cam_params_.r_gain / 10.0);
+                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, value / 10.0);
+                return true;
+            }
+            case CamParamsEnum::GGain :
+            {
                 status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_GREEN);
-                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, this->cam_params_.g_gain / 10.0);
+                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, value / 10.0);
+                return true;
+            }
+            case CamParamsEnum::BGain :
+            {
                 status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_BLUE);
-                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, this->cam_params_.b_gain / 10.0);
+                status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, value / 10.0);
                 return true;
             }
             default :

@@ -20,6 +20,7 @@
 #include "rcl_interfaces/msg/set_parameters_result.hpp"
 
 #include "rmos_interfaces/msg/camera_info.hpp"
+#include "rmos_interfaces/srv/camera_info.hpp"
 #include "daheng.hpp"
 
 namespace rmos_sensor
@@ -49,10 +50,12 @@ private:
 public:
     rcl_interfaces::msg::SetParametersResult ParamtersCallBack(const std::vector<rclcpp::Parameter> & param);
     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
+    rclcpp::Service<rmos_interfaces::srv::CameraInfo>::SharedPtr camera_exp_info_srv_;
 
 private:
     void capture_thread_lambda();
-    void AutoExposureCallBack(rmos_interfaces::msg::CameraInfo::SharedPtr info);
+    void AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv::CameraInfo::Request> request,
+                                    std::shared_ptr<rmos_interfaces::srv::CameraInfo::Response> response);
 
 };
 

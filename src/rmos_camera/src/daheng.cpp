@@ -223,16 +223,18 @@ bool DahengCamera::SensorShut()
 
 bool DahengCamera::AutoExposure(double exposure_factor)
 {
-    if(!cam_params_.auto_exposure){
-        return false;
-    }
+    this->cam_params_.auto_exposure = true;
+    GX_STATUS status;
+    status = GXSetEnum(device_, GX_ENUM_EXPOSURE_AUTO, GX_EXPOSURE_AUTO_CONTINUOUS);
+    status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, 5000);
+    status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, 20000);
 }
 
 bool DahengCamera::AutoWhiteBalance(std::vector<double> white_balance_factor)
 {
-    if(cam_params_.auto_white_balance){
-        return false;
-    }
+    this->cam_params_.auto_white_balance = true;
+    GX_STATUS status;
+    status = GXSetEnum(device_, GX_ENUM_BALANCE_WHITE_AUTO, GX_BALANCE_WHITE_AUTO_CONTINUOUS);
 }
 
-}
+} // namespace rmos_camera
