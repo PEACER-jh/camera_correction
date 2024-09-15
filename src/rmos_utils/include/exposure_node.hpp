@@ -32,19 +32,28 @@ public:
     ExposureNode(const rclcpp::NodeOptions & options);
     ~ExposureNode();
 
+    std::shared_ptr<image_transport::Subscriber> image_sub_;
+    rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_sub_;
     rclcpp::Client<rmos_interfaces::srv::CameraInfo>::SharedPtr camera_exp_info_clt_;
+    rclcpp::Subscription<rmos_interfaces::msg::CameraInfo>::SharedPtr camera_exp_info_sub_;
 
 private:
-    std::shared_ptr<image_transport::Subscriber> image_sub_;
     sensor_msgs::msg::Image::SharedPtr img_msg_;
-    sensor_msgs::msg::CameraInfo::SharedPtr camera_info_;
+    sensor_msgs::msg::CameraInfo camera_info_;
     rmos_interfaces::msg::CameraInfo camera_info_msg_;
 
-    // cv::Mat image_;
+    cv::Mat image_;
+    cv::Mat camera_matrix;
+    cv::Mat dist_coeffs_;
+    bool is_auto_exposure_;
+    bool is_auto_white_balance_;
     // std::thread exposure_thread_;
     // void exposure_thread_lambda();
 
-    bool RawImageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr & img);
+    void RawImageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr & img);
+    void CameraInfoCallBack(const sensor_msgs::msg::CameraInfo::ConstSharedPtr info);
+    
+    void ImageInfoCallBack(const rmos_interfaces::msg::CameraInfo::ConstSharedPtr info);
     void AutoExposure();
     void AutoWhiteBalance();
 
