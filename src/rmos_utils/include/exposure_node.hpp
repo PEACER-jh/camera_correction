@@ -26,6 +26,25 @@
 
 namespace rmos_utils
 {
+enum class AutoExposureMode
+{
+    AVERAGE_METERING,               // 平均测光
+    CENTER_WEIGHTED_METERING,       // 中心加权测光
+    SPOT_METERING,                  // 点测光
+    MATRIX_OR_MULTI_ZONE_METERING,  // 矩阵测光或多区域测光
+    DYNAMIC_RANGE_OPTIMIZATION,     // 动态范围优化
+};
+
+enum class AutoWhiteBalanceMode
+{
+    GrayWorldAssumption,            // 灰度世界假设
+    PerfectRelflectorAssumption,    // 完美反射假设
+    GamutMapping,                   // 基于高斯模型的色域映射
+    ColorTemperature,               // 基于色温的算法
+    Retinex,                        // 基于Retinex的算法    
+};
+
+
 class ExposureNode : public rclcpp::Node
 {
 public:
@@ -47,6 +66,8 @@ private:
     cv::Mat dist_coeffs_;
     bool is_auto_exposure_;
     bool is_auto_white_balance_;
+    AutoExposureMode AutoExposureMode_;
+    AutoWhiteBalanceMode AutoWhiteBalanceMode_;
     // std::thread exposure_thread_;
     // void exposure_thread_lambda();
 
@@ -54,8 +75,9 @@ private:
     void CameraInfoCallBack(const sensor_msgs::msg::CameraInfo::ConstSharedPtr info);
     
     void ImageInfoCallBack(const rmos_interfaces::msg::CameraInfo::ConstSharedPtr info);
-    void AutoExposure();
-    void AutoWhiteBalance();
+    cv::Mat drawHistogram(const cv::Mat & img, bool is_gray);
+    void AutoExposure(const cv::Mat & img);
+    void AutoWhiteBalance(const cv::Mat & img);
 
 };
 
