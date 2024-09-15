@@ -12,6 +12,7 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options) :
     RCLCPP_INFO(this->get_logger(), "Starting node [%s]", rclcpp::Node::get_name());
 
     this->time_offset = this->declare_parameter<int>("/camera/time_offset", 0);
+    // std::cout << "DEBUG DEBUG  DEBUG DEBUG DEBUG" << std::endl;
 
     camera_->cam_params_.width = this->declare_parameter<int>("/camera/width", 1920);
     camera_->cam_params_.height =  this->declare_parameter<int>("/camera/height", 1200);
@@ -37,7 +38,6 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options) :
     camera_info_msg_.red_gain = camera_->cam_params_.r_gain;
     camera_info_msg_.green_gain = camera_->cam_params_.g_gain;
     camera_info_msg_.blue_gain = camera_->cam_params_.b_gain;
-
 
     bool is_open = camera_->SensorOpen();
     
