@@ -62,7 +62,7 @@ typedef struct CamParamsStruct
 class DahengCamera
 {
 public:
-    DahengCamera(const std::string camer_sn);
+    DahengCamera(const std::string camer_sn = "");
     ~DahengCamera();
 
     bool SensorOpen();
@@ -75,7 +75,7 @@ public:
     bool AutoExposure(double exposure_factor);
     bool AutoWhiteBalance(std::vector<double> white_balance_factor);
 
-private:
+protected:
     bool isOpen();
     bool isInit();
     bool isRun();
