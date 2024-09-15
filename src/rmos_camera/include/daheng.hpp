@@ -160,6 +160,7 @@ public:
     template<typename T>
     bool SetParam(CamParamsEnum type, T value) 
     {
+        GX_STATUS status;
         switch(type)
         {
             case CamParamsEnum::Exposure :

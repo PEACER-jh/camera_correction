@@ -29,7 +29,8 @@ namespace rmos_camera
 class CameraNode : public rclcpp::Node
 {
 public:
-    CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options);
+    // CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options);
+    CameraNode(const rclcpp::NodeOptions & options);
     ~CameraNode();
 
 private:

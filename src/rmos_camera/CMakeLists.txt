@@ -29,9 +29,10 @@ rclcpp_components_register_node(${PROJECT_NAME}
   EXECUTABLE daheng_camera
 )
 
-install(
-        DIRECTORY         
-        DESTINATION lib/  
+install(TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin 
 )
 ament_auto_package(
   INSTALL_TO_SHARE

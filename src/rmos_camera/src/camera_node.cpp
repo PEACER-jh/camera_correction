@@ -1,19 +1,20 @@
-#include "include/camera_node.hpp"
+#include "camera_node.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 namespace rmos_camera
 {
-CameraNode::CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options) : 
+// CameraNode::CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options) :
+CameraNode::CameraNode(const rclcpp::NodeOptions & options) : 
     rclcpp::Node("daheng_camera", options),
     frame_id_(0),
     time_offset(0)
 {
-    RCLCPP_INFO(this->get_logger(), "Starting node [%s]", node_name.c_str());
+    RCLCPP_INFO(this->get_logger(), "Starting node [%s]", rclcpp::Node::get_name());
 
     this->time_offset = this->declare_parameter<int>("/camera/time_offset", 0);
 
-    camera_->cam_params_.width = this->declare_parameter<size_t>("/camera/width", 1920);
-    camera_->cam_params_.height =  this->declare_parameter<size_t>("/camera/height", 1200);
+    camera_->cam_params_.width = this->declare_parameter<int>("/camera/width", 1920);
+    camera_->cam_params_.height =  this->declare_parameter<int>("/camera/height", 1200);
     camera_->cam_params_.auto_exposure = this->declare_parameter<bool>("/camera/auto_exposure", false);
     camera_->cam_params_.exposure = this->declare_parameter<int>("/camera/exposure", 1000);
     camera_->cam_params_.brightness = this->declare_parameter<float>("/camera/brightness", 0.0);
