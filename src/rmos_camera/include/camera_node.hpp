@@ -51,6 +51,7 @@ private:
 public:
     rcl_interfaces::msg::SetParametersResult ParamtersCallBack(const std::vector<rclcpp::Parameter> & param);
     rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
+    rclcpp::Publisher<rmos_interfaces::msg::CameraInfo>::SharedPtr camera_exp_info_pub_;
     rclcpp::Service<rmos_interfaces::srv::CameraInfo>::SharedPtr camera_exp_info_srv_;
 
 private:

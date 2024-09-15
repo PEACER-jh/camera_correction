@@ -1,4 +1,4 @@
-#include "../include/camera_node.hpp"
+#include "camera_node.hpp"
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 namespace rmos_camera
@@ -40,7 +40,6 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options) :
     camera_info_msg_.blue_gain = camera_->cam_params_.b_gain;
 
     bool is_open = camera_->SensorOpen();
-    std::cout << "DEBUG DEBUG DEBUG DEBUG DEBUG" << std::endl;
     
     cam_info_manager_ = std::make_unique<camera_info_manager::CameraInfoManager>(this, "DahengCam");
     auto pkg_path = ament_index_cpp::get_package_share_directory("rmos_bringup");
@@ -53,14 +52,13 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options) :
 
     img_pub_ = image_transport::create_camera_publisher(this, "/image_raw", rmw_qos_profile_default);
     camera_info_pub_ = this->create_publisher<sensor_msgs::msg::CameraInfo>("/camera/info", 10);
+    camera_exp_info_pub_ = this->create_publisher<rmos_interfaces::msg::CameraInfo>("/camera/exp_info", 10);
     camera_exp_info_srv_ = this->create_service<rmos_interfaces::srv::CameraInfo>
                 ("/camera/exposure_info", std::bind(&CameraNode::AutoExposureCallBack, this, std::placeholders::_1, std::placeholders::_2));
 
     capture_thread_ = std::thread{[this]()->void {this->capture_thread_lambda();}};
     callback_handle_ = this->add_on_set_parameters_callback
                 (std::bind(&CameraNode::ParamtersCallBack, this, std::placeholders::_1));
-
-
 
 }
 
@@ -91,6 +89,17 @@ void CameraNode::capture_thread_lambda()
             
             camera_info_pub_->publish(camera_info_);
             img_pub_.publish(*img_msg_, camera_info_);
+
+            rmos_interfaces::msg::CameraInfo info;
+            info.exposure = this->camera_->cam_params_.auto_exposure;
+            info.exposure = this->camera_->cam_params_.exposure;
+            info.auto_white_balance = this->camera_->cam_params_.auto_white_balance;
+            info.gain = this->camera_->cam_params_.gain;
+            info.red_gain = this->camera_->cam_params_.r_gain;
+            info.blue_gain = this->camera_->cam_params_.b_gain;
+            info.green_gain = this->camera_->cam_params_.g_gain;
+
+            camera_exp_info_pub_->publish(info);
         }
         else
         {
