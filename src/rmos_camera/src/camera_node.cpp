@@ -146,11 +146,13 @@ void CameraNode::AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv
 
     if(request->info.auto_exposure)
     {
+        RCLCPP_INFO(this->get_logger(), "auto exposure is on");
         this->camera_->cam_params_.exposure = request->info.exposure;
         this->camera_->SetParam(rmos_camera::CamParamsEnum::Exposure, this->camera_->cam_params_.exposure);
     }
     if(request->info.auto_white_balance)
     {
+        RCLCPP_INFO(this->get_logger(), "auto white balance is on");
         this->camera_->cam_params_.r_gain = request->info.red_gain;
         this->camera_->cam_params_.g_gain = request->info.green_gain;
         this->camera_->cam_params_.b_gain = request->info.blue_gain;
@@ -158,7 +160,7 @@ void CameraNode::AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv
         this->camera_->SetParam(rmos_camera::CamParamsEnum::GGain, this->camera_->cam_params_.g_gain);
         this->camera_->SetParam(rmos_camera::CamParamsEnum::BGain, this->camera_->cam_params_.b_gain);
     }
-
+    response->success = true;
 }
 
 } // namespace rmos_camera

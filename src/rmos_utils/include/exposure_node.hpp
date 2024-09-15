@@ -61,6 +61,8 @@ private:
     sensor_msgs::msg::CameraInfo camera_info_;
     rmos_interfaces::msg::CameraInfo camera_info_msg_;
 
+    double exp_ideal_;
+    double exp_weight_;
     cv::Mat image_;
     cv::Mat camera_matrix;
     cv::Mat dist_coeffs_;
@@ -68,16 +70,17 @@ private:
     bool is_auto_white_balance_;
     AutoExposureMode AutoExposureMode_;
     AutoWhiteBalanceMode AutoWhiteBalanceMode_;
-    // std::thread exposure_thread_;
-    // void exposure_thread_lambda();
+
+    double ae_a, ae_b;
+    double awb_a, awb_b;
 
     void RawImageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr & img);
     void CameraInfoCallBack(const sensor_msgs::msg::CameraInfo::ConstSharedPtr info);
     
     void ImageInfoCallBack(const rmos_interfaces::msg::CameraInfo::ConstSharedPtr info);
     cv::Mat drawHistogram(const cv::Mat & img, bool is_gray);
-    void AutoExposure(const cv::Mat & img);
-    void AutoWhiteBalance(const cv::Mat & img);
+    double AutoExposure(const cv::Mat & img);
+    std::vector<double> AutoWhiteBalance(const cv::Mat & img);
 
 };
 

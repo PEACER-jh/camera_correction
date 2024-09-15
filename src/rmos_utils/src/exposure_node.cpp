@@ -5,9 +5,22 @@ namespace rmos_utils
 ExposureNode::ExposureNode(const rclcpp::NodeOptions & options) : 
     rclcpp::Node("exposure_node", options),
     is_auto_exposure_(false),
-    is_auto_white_balance_(false)
+    is_auto_white_balance_(false),
+    exp_ideal_(128.0),
+    exp_weight_(1.0)
 {
     RCLCPP_INFO(this->get_logger(), "Starting node [%s]", rclcpp::Node::get_name());
+
+    this->exp_ideal_ = this->declare_parameter<double>("exp_ideal", 128.0);
+    this->exp_weight_ = this->declare_parameter<double>("exp_weight", 1.0);
+    this->ae_a = this->declare_parameter<double>("ae_a", 1.0);
+    this->ae_b = this->declare_parameter<double>("ae_b", 0.0);
+    this->awb_a = this->declare_parameter<double>("awb_a", 1.0);
+    this->awb_b = this->declare_parameter<double>("awb_b", 0.0);
+    this->AutoExposureMode_ = this->declare_parameter<rmos_utils::AutoExposureMode>
+                                                    ("exp_auto_exposure_mode", rmos_utils::AutoExposureMode::AVERAGE_METERING);
+    this->AutoWhiteBalanceMode_ = this->declare_parameter<rmos_utils::AutoWhiteBalanceMode>
+                                                    ("exp_auto_white_balance_mode", rmos_utils::AutoWhiteBalanceMode::GrayWorldAssumption);
 
     image_sub_ = std::make_shared<image_transport::Subscriber>(image_transport::create_subscription(
                 this, "/image_raw", std::bind(&ExposureNode::RawImageCallBack, this, std::placeholders::_1),
@@ -27,7 +40,25 @@ ExposureNode::~ExposureNode()
 
 void ExposureNode::RawImageCallBack(const sensor_msgs::msg::Image::ConstSharedPtr & img)
 {
+    this->image_ = cv_bridge::toCvShare(img, "bgr8")->image;
+    double ae_factor = 1.0;
+    std::vector<double> awb_factor = {1.0, 1.0, 1.0};
+    if(this->is_auto_exposure_)
+        ae_factor = AutoExposure(image_);
+    if(this->is_auto_white_balance_)
+        awb_factor = AutoWhiteBalance(image_);
+
+    double ae_exposure = ae_a * ae_factor + ae_b;
+    std::vector<double> awb_gain;
+    for(int i = 0; i < 3; i++)
+        awb_gain.push_back(awb_a * awb_factor[i] + awb_b);
     
+    this->camera_info_msg_.exposure = ae_exposure;
+    this->camera_info_msg_.red_gain = awb_gain[0];
+    this->camera_info_msg_.green_gain = awb_gain[1];
+    this->camera_info_msg_.blue_gain = awb_gain[2];
+    auto exp_request = std::make_shared<rmos_interfaces::srv::CameraInfo::Request>(this->camera_info_msg_);
+    auto exp_result = this->camera_exp_info_clt_->async_send_request(exp_request);
 }
 
 void ExposureNode::CameraInfoCallBack(const sensor_msgs::msg::CameraInfo::ConstSharedPtr info)
@@ -107,11 +138,75 @@ cv::Mat ExposureNode::drawHistogram(const cv::Mat & img, bool is_gray)
     }
 }
 
-void ExposureNode::AutoExposure(const cv::Mat & img)
+double ExposureNode::AutoExposure(const cv::Mat & img)
 {
+    cv::Mat gray;
+    double factor = 1.0;
+    if(image_.type() != CV_8UC1)
+        cv::cvtColor(image_, gray, cv::COLOR_BGR2GRAY);
+    else
+        gray = image_.clone();
+    
+    switch(this->AutoExposureMode_)
+    {
+        case AutoExposureMode::AVERAGE_METERING:
+        {
+            double average_brightness = cv::mean(gray)[0];
+            factor = this->exp_ideal_ / average_brightness;
+
+std::cout << "*********************************************" << std::endl;
+std::cout << "AE: AVERAGE METERING" << std::endl;
+std::cout << "average brightness of image: " << average_brightness << std::endl;
+std::cout << "adjustment factor of image: " << factor << std::endl;
+std::cout << "*********************************************" << std::endl;
+            return factor;
+        }
+        case AutoExposureMode::CENTER_WEIGHTED_METERING:
+        {
+            int rows = gray.rows;
+            int cols = gray.cols;
+
+            cv::Mat weightMat = cv::Mat::zeros(rows, cols, CV_32FC1);
+            cv::Point2f center(cols / 2.0, rows / 2.0);
+            double radius = std::sqrt(center.x * center.x + center.y * center.y);
+
+            for(int v = 0; v < rows; ++v)
+                for(int u = 0; u < cols; ++u)
+                {
+                    double distance = std::sqrt(std::pow(u - center.x, 2) + std::pow(v - center.y, 2));
+                    weightMat.at<float>(v, u) = this->exp_weight_ * (1.0 - distance / radius);
+                }
+
+            cv::Mat img;
+            cv::Mat dst(gray.size(), CV_32FC1);
+            gray.convertTo(img, CV_32FC1);
+            cv::multiply(img, weightMat, dst);
+            double weighted_average_brightness = cv::mean(dst)[0];
+            double adjustment_factor = this->exp_ideal_ / weighted_average_brightness;
+
+std::cout << "*********************************************" << std::endl;
+std::cout << "AE: CENTER WEIGHTED METERING" << std::endl;
+std::cout << "average brightness of image: " << weighted_average_brightness << std::endl;
+std::cout << "adjustment factor of image: " << adjustment_factor << std::endl;
+std::cout << "*********************************************" << std::endl;
+            return factor;
+        }
+        case AutoExposureMode::SPOT_METERING:
+        case AutoExposureMode::MATRIX_OR_MULTI_ZONE_METERING:
+        case AutoExposureMode::DYNAMIC_RANGE_OPTIMIZATION:
+        {
+            RCLCPP_WARN(this->get_logger(), "AutoExposureMode not supported");
+            return factor;
+        }
+    }
+}
+
+std::vector<double> ExposureNode::AutoWhiteBalance(const cv::Mat & img) 
+{
+    RCLCPP_WARN(this->get_logger(), "AutoWhiteBalance not supported");
+}
 
 }
 
-void ExposureNode::AutoWhiteBalance(const cv::Mat & img) {}
-
-}
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(rmos_utils::ExposureNode)
