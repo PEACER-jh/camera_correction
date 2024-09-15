@@ -1,13 +1,13 @@
 #ifndef EXPOSURE_NODE_HPP
 #define EXPOSURE_NODE_HPP
 
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <memory>
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <algorithm>
 #include <functional>
 
 #include "rclcpp/rclcpp.hpp"

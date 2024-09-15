@@ -17,10 +17,10 @@ ExposureNode::ExposureNode(const rclcpp::NodeOptions & options) :
     this->ae_b = this->declare_parameter<double>("ae_b", 0.0);
     this->awb_a = this->declare_parameter<double>("awb_a", 1.0);
     this->awb_b = this->declare_parameter<double>("awb_b", 0.0);
-    this->AutoExposureMode_ = this->declare_parameter<rmos_utils::AutoExposureMode>
-                                                    ("exp_auto_exposure_mode", rmos_utils::AutoExposureMode::AVERAGE_METERING);
-    this->AutoWhiteBalanceMode_ = this->declare_parameter<rmos_utils::AutoWhiteBalanceMode>
-                                                    ("exp_auto_white_balance_mode", rmos_utils::AutoWhiteBalanceMode::GrayWorldAssumption);
+    int ae_mode = this->declare_parameter<int>("exp_auto_exposure_mode", 0);
+    int awb_mode = this->declare_parameter<int>("exp_auto_white_balance_mode", 0);
+    this->AutoExposureMode_ = static_cast<AutoExposureMode>(ae_mode);
+    this->AutoWhiteBalanceMode_ = static_cast<AutoWhiteBalanceMode>(awb_mode);
 
     image_sub_ = std::make_shared<image_transport::Subscriber>(image_transport::create_subscription(
                 this, "/image_raw", std::bind(&ExposureNode::RawImageCallBack, this, std::placeholders::_1),
@@ -53,11 +53,19 @@ void ExposureNode::RawImageCallBack(const sensor_msgs::msg::Image::ConstSharedPt
     for(int i = 0; i < 3; i++)
         awb_gain.push_back(awb_a * awb_factor[i] + awb_b);
     
-    this->camera_info_msg_.exposure = ae_exposure;
+    this->camera_info_msg_.exposure = (int)ae_exposure;
     this->camera_info_msg_.red_gain = awb_gain[0];
     this->camera_info_msg_.green_gain = awb_gain[1];
     this->camera_info_msg_.blue_gain = awb_gain[2];
-    auto exp_request = std::make_shared<rmos_interfaces::srv::CameraInfo::Request>(this->camera_info_msg_);
+    
+    auto exp_request = std::make_shared<rmos_interfaces::srv::CameraInfo::Request>();
+    exp_request->info.auto_exposure = (bool)camera_info_msg_.auto_exposure;
+    exp_request->info.exposure = (int)camera_info_msg_.exposure;
+    exp_request->info.auto_white_balance = (bool)camera_info_msg_.auto_white_balance;
+    exp_request->info.gain = (float)camera_info_msg_.gain;
+    exp_request->info.red_gain = (float)camera_info_msg_.red_gain;
+    exp_request->info.blue_gain = (float)camera_info_msg_.blue_gain;
+    exp_request->info.green_gain = (float)camera_info_msg_.green_gain;
     auto exp_result = this->camera_exp_info_clt_->async_send_request(exp_request);
 }
 
@@ -136,6 +144,7 @@ cv::Mat ExposureNode::drawHistogram(const cv::Mat & img, bool is_gray)
         }
         return histImg;
     }
+    return cv::Mat();
 }
 
 double ExposureNode::AutoExposure(const cv::Mat & img)
@@ -196,14 +205,19 @@ std::cout << "*********************************************" << std::endl;
         case AutoExposureMode::DYNAMIC_RANGE_OPTIMIZATION:
         {
             RCLCPP_WARN(this->get_logger(), "AutoExposureMode not supported");
-            return factor;
+            break;
         }
     }
+    return factor;
 }
 
 std::vector<double> ExposureNode::AutoWhiteBalance(const cv::Mat & img) 
 {
+    std::vector<double> factors;
+    for(int i = 0; i < 3; ++i)
+        factors.push_back(1.0);
     RCLCPP_WARN(this->get_logger(), "AutoWhiteBalance not supported");
+    return factors;
 }
 
 }

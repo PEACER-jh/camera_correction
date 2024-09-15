@@ -16,10 +16,10 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options) :
     this->camera_ = std::make_shared<rmos_camera::DahengCamera>();
     camera_->cam_params_.width = this->declare_parameter<int>("/camera/width", 1920);
     camera_->cam_params_.height = this->declare_parameter<int>("/camera/height", 1200);
-    camera_->cam_params_.auto_exposure = this->declare_parameter<bool>("/camera/auto_exposure", false);
+    camera_->cam_params_.auto_exposure = this->declare_parameter<bool>("/camera/auto_exposure", true);
     camera_->cam_params_.exposure = this->declare_parameter<int>("/camera/exposure", 10000);
     camera_->cam_params_.brightness = this->declare_parameter<float>("/camera/brightness", 0.0);
-    camera_->cam_params_.auto_white_balance = this->declare_parameter<bool>("/camera/auto_white_balance", false);
+    camera_->cam_params_.auto_white_balance = this->declare_parameter<bool>("/camera/auto_white_balance", true);
     camera_->cam_params_.white_balance = this->declare_parameter<float>("/camera/white_balance", 0.0);
     camera_->cam_params_.gain = this->declare_parameter<float>("/camera/gain", 9.0);
     camera_->cam_params_.r_gain = this->declare_parameter<float>("/camera/r_gain", 15.8);
@@ -142,7 +142,6 @@ void CameraNode::AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv
         RCLCPP_INFO(this->get_logger(), "auto exposure and white balance are both off");
         return;
     }
-
 
     if(request->info.auto_exposure)
     {
