@@ -13,11 +13,11 @@ ExposureNode::ExposureNode(const rclcpp::NodeOptions & options) :
 
     this->exp_ideal_ = this->declare_parameter<double>("exp_ideal", 128.0);
     this->exp_weight_ = this->declare_parameter<double>("exp_weight", 1.0);
-    this->ae_a = this->declare_parameter<double>("ae_a", 1.0);
+    this->ae_a = this->declare_parameter<double>("ae_a", 1000.0);
     this->ae_b = this->declare_parameter<double>("ae_b", 0.0);
     this->awb_a = this->declare_parameter<double>("awb_a", 1.0);
     this->awb_b = this->declare_parameter<double>("awb_b", 0.0);
-    int ae_mode = this->declare_parameter<int>("exp_auto_exposure_mode", 0);
+    int ae_mode = this->declare_parameter<int>("exp_auto_exposure_mode", 1);
     int awb_mode = this->declare_parameter<int>("exp_auto_white_balance_mode", 0);
     this->AutoExposureMode_ = static_cast<AutoExposureMode>(ae_mode);
     this->AutoWhiteBalanceMode_ = static_cast<AutoWhiteBalanceMode>(awb_mode);
@@ -191,15 +191,16 @@ std::cout << "*********************************************" << std::endl;
             gray.convertTo(img, CV_32FC1);
             cv::multiply(img, weightMat, dst);
             double weighted_average_brightness = cv::mean(dst)[0];
-            double adjustment_factor = this->exp_ideal_ / weighted_average_brightness;
+            factor = this->exp_ideal_ / weighted_average_brightness;
 
 std::cout << "*********************************************" << std::endl;
 std::cout << "AE: CENTER WEIGHTED METERING" << std::endl;
 std::cout << "average brightness of image: " << weighted_average_brightness << std::endl;
-std::cout << "adjustment factor of image: " << adjustment_factor << std::endl;
+std::cout << "adjustment factor of image: " << factor << std::endl;
 std::cout << "*********************************************" << std::endl;
             return factor;
         }
+        /* TODO */
         case AutoExposureMode::SPOT_METERING:
         case AutoExposureMode::MATRIX_OR_MULTI_ZONE_METERING:
         case AutoExposureMode::DYNAMIC_RANGE_OPTIMIZATION:
@@ -211,6 +212,7 @@ std::cout << "*********************************************" << std::endl;
     return factor;
 }
 
+/* TODO */
 std::vector<double> ExposureNode::AutoWhiteBalance(const cv::Mat & img) 
 {
     std::vector<double> factors;

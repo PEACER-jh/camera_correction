@@ -19,7 +19,7 @@ CameraNode::CameraNode(const rclcpp::NodeOptions & options) :
     camera_->cam_params_.auto_exposure = this->declare_parameter<bool>("/camera/auto_exposure", true);
     camera_->cam_params_.exposure = this->declare_parameter<int>("/camera/exposure", 10000);
     camera_->cam_params_.brightness = this->declare_parameter<float>("/camera/brightness", 0.0);
-    camera_->cam_params_.auto_white_balance = this->declare_parameter<bool>("/camera/auto_white_balance", true);
+    camera_->cam_params_.auto_white_balance = this->declare_parameter<bool>("/camera/auto_white_balance", false);
     camera_->cam_params_.white_balance = this->declare_parameter<float>("/camera/white_balance", 0.0);
     camera_->cam_params_.gain = this->declare_parameter<float>("/camera/gain", 9.0);
     camera_->cam_params_.r_gain = this->declare_parameter<float>("/camera/r_gain", 15.8);
@@ -91,7 +91,7 @@ void CameraNode::capture_thread_lambda()
             img_pub_.publish(*img_msg_, camera_info_);
 
             rmos_interfaces::msg::CameraInfo info;
-            info.exposure = this->camera_->cam_params_.auto_exposure;
+            info.auto_exposure = this->camera_->cam_params_.auto_exposure;
             info.exposure = this->camera_->cam_params_.exposure;
             info.auto_white_balance = this->camera_->cam_params_.auto_white_balance;
             info.gain = this->camera_->cam_params_.gain;
@@ -140,6 +140,7 @@ void CameraNode::AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv
     if(!request->info.auto_exposure && !request->info.auto_white_balance)
     {
         RCLCPP_INFO(this->get_logger(), "auto exposure and white balance are both off");
+        response->success = false;
         return;
     }
 
@@ -147,8 +148,11 @@ void CameraNode::AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv
     {
         RCLCPP_INFO(this->get_logger(), "auto exposure is on");
         this->camera_->cam_params_.exposure = request->info.exposure;
-        this->camera_->SetParam(rmos_camera::CamParamsEnum::Exposure, this->camera_->cam_params_.exposure);
+        RCLCPP_INFO(this->get_logger(), "exposure is %d", this->camera_->cam_params_.exposure);
+        bool is = this->camera_->SetParam(rmos_camera::CamParamsEnum::Exposure, this->camera_->cam_params_.exposure);
+        RCLCPP_INFO(this->get_logger(), "exposure set %d", is);
     }
+    /* TODO */
     if(request->info.auto_white_balance)
     {
         RCLCPP_INFO(this->get_logger(), "auto white balance is on");

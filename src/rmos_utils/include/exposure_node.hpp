@@ -21,6 +21,8 @@
 #include "camera_info_manager/camera_info_manager.hpp"
 #include "rcl_interfaces/msg/set_parameters_result.hpp"
 
+#include <opencv2/opencv.hpp>
+
 #include "rmos_interfaces/msg/camera_info.hpp"
 #include "rmos_interfaces/srv/camera_info.hpp"
 
