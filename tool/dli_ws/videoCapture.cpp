@@ -7,9 +7,7 @@
 
 int main() 
 {
-    cv::namedWindow("FRAME_LEFT", cv::WINDOW_NORMAL);
-    cv::namedWindow("FRAME_RIGHT", cv::WINDOW_NORMAL);
-    cv::Mat f0, f1;
+    cv::Mat fl, fr;
     std::vector<cv::VideoCapture> capture;
     
     int capture_id = 0;
@@ -30,20 +28,45 @@ int main()
         }
     }
     std::cout << "capture number: " << capture.size() << std::endl;
-    cv::VideoCapture c0 = capture.front();
-    cv::VideoCapture c1 = capture.back();
-
-    while(c0.isOpened() && c1.isOpened())
+    cv::VideoCapture cl, cr;
+    cv::namedWindow("CHOOSE", cv::WINDOW_NORMAL);
+    cv::Mat frame;
+    for(auto cap : capture)
     {
-        c0 >> f0;
-        c1 >> f1;
-        cv::imshow("FRAME_LEFT", f0);
-        cv::imshow("FRAME_RIGHT", f1);
+        int choose = -1;
+        while(cap.isOpened())
+        {
+            cap >> frame;
+            cv::imshow("CHOOSE", frame);
+            choose = cv::waitKey(30);
+            if(choose == '0'){
+                cl = cap;
+                break;
+            }
+            else if(choose == '1'){
+                cr = cap;
+                break;
+            } 
+            else
+                return -1;
+        }
+    }
+    delete [] capture.data();
+    cv::destroyWindow("CHOOSE");
+
+    cv::namedWindow("FRAME_LEFT", cv::WINDOW_NORMAL);
+    cv::namedWindow("FRAME_RIGHT", cv::WINDOW_NORMAL);
+    while(cl.isOpened() && cr.isOpened())
+    {
+        cl >> fl;
+        cr >> fr;
+        cv::imshow("FRAME_LEFT", fl);
+        cv::imshow("FRAME_RIGHT", fr);
         cv::waitKey(100);
     }
 
-    c0.release();
-    c1.release();
+    cl.release();
+    cr.release();
     cv::destroyAllWindows();
     return 0;
 }
