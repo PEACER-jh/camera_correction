@@ -19,3 +19,6 @@ set(SOURCES
 
 add_executable(app videoCapture.cpp ${SOURCES})
 target_link_libraries(app ${OpenCV_LIBS})
+
+add_executable(main main.cpp ${SOURCES})
+target_link_libraries(main ${OpenCV_LIBS})

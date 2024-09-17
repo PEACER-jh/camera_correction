@@ -31,24 +31,23 @@ int main()
     cv::VideoCapture cl, cr;
     cv::namedWindow("CHOOSE", cv::WINDOW_NORMAL);
     cv::Mat frame;
-    for(auto cap : capture)
+    // for(auto cap : capture)
+    for(int i = 0; i < capture.size(); i++)
     {
         int choose = -1;
-        while(cap.isOpened())
+        while(capture[i].isOpened())
         {
-            cap >> frame;
+            capture[i] >> frame;
             cv::imshow("CHOOSE", frame);
             choose = cv::waitKey(30);
-            if(choose == '0'){
-                cl = cap;
+            if(choose == 0){
+                cl = capture[i];
                 break;
             }
-            else if(choose == '1'){
-                cr = cap;
+            else if(choose == 1){
+                cr = capture[i];
                 break;
             } 
-            else
-                return -1;
         }
     }
     delete [] capture.data();
