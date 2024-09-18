@@ -47,21 +47,24 @@ int main()
                 cr = cap;
                 break;
             }
-            else if(choose == 27){
+            else if(choose == 'q'){
                 break;
             }
         }
     }
     cv::destroyWindow("CHOOSE");
 
-    cv::namedWindow("FRAME_LEFT", cv::WINDOW_NORMAL);
-    cv::namedWindow("FRAME_RIGHT", cv::WINDOW_NORMAL);
+    // cv::namedWindow("FRAME_LEFT", cv::WINDOW_NORMAL);
+    // cv::namedWindow("FRAME_RIGHT", cv::WINDOW_NORMAL);
+    cv::namedWindow("COMBINE", cv::WINDOW_NORMAL);
     while(cl.isOpened() && cr.isOpened())
     {
         cl >> fl;
         cr >> fr;
-        cv::imshow("FRAME_LEFT", fl);
-        cv::imshow("FRAME_RIGHT", fr);
+        // cv::imshow("FRAME_LEFT", fl);
+        // cv::imshow("FRAME_RIGHT", fr);
+        cv::hconcat(fl, fr, frame);
+        cv::imshow("COMBINE", frame);
         cv::waitKey(100);
     }
 
