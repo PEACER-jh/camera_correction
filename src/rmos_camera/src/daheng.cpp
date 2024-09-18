@@ -141,7 +141,8 @@ bool DahengCamera::SensorInit()
     status = GXSetFloat(device_, GX_FLOAT_EXPOSURE_TIME, this->cam_params_.exposure);
 
     // set white balance of camera
-    status = GXSetEnum(device_, GX_ENUM_BALANCE_WHITE_AUTO, GX_BALANCE_WHITE_AUTO_OFF);
+    // status = GXSetEnum(device_, GX_ENUM_BALANCE_WHITE_AUTO, GX_BALANCE_WHITE_AUTO_OFF);
+    status = GXSetEnum(device_, GX_ENUM_BALANCE_WHITE_AUTO, GX_BALANCE_WHITE_AUTO_CONTINUOUS);
     status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_RED);
     status = GXSetFloat(device_, GX_FLOAT_BALANCE_RATIO, this->cam_params_.r_gain / 10.0);
     status = GXSetEnum(device_, GX_ENUM_BALANCE_RATIO_SELECTOR, GX_BALANCE_RATIO_SELECTOR_GREEN);
@@ -226,7 +227,7 @@ bool DahengCamera::AutoExposure(double exposure_factor)
     this->cam_params_.auto_exposure = true;
     GX_STATUS status;
     status = GXSetEnum(device_, GX_ENUM_EXPOSURE_AUTO, GX_EXPOSURE_AUTO_CONTINUOUS);
-    status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, 5000);
+    status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MIN, 500);
     status = GXSetFloat(device_, GX_FLOAT_AUTO_EXPOSURE_TIME_MAX, 20000);
     return true;
 }

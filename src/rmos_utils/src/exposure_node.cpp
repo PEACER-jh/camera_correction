@@ -13,11 +13,11 @@ ExposureNode::ExposureNode(const rclcpp::NodeOptions & options) :
 
     this->exp_ideal_ = this->declare_parameter<double>("exp_ideal", 128.0);
     this->exp_weight_ = this->declare_parameter<double>("exp_weight", 1.0);
-    this->ae_a = this->declare_parameter<double>("ae_a", 1000.0);
-    this->ae_b = this->declare_parameter<double>("ae_b", 0.0);
+    this->ae_a = this->declare_parameter<double>("ae_a", 10000.0);
+    this->ae_b = this->declare_parameter<double>("ae_b", 1000.0);
     this->awb_a = this->declare_parameter<double>("awb_a", 1.0);
     this->awb_b = this->declare_parameter<double>("awb_b", 0.0);
-    int ae_mode = this->declare_parameter<int>("exp_auto_exposure_mode", 1);
+    int ae_mode = this->declare_parameter<int>("exp_auto_exposure_mode", 0);
     int awb_mode = this->declare_parameter<int>("exp_auto_white_balance_mode", 0);
     this->AutoExposureMode_ = static_cast<AutoExposureMode>(ae_mode);
     this->AutoWhiteBalanceMode_ = static_cast<AutoWhiteBalanceMode>(awb_mode);
