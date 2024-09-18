@@ -15,6 +15,7 @@ include_directories(
 
 set(SOURCES
     ./src/cameraRegister.cpp
+    ./src/features.cpp
 )
 
 add_executable(app videoCapture.cpp ${SOURCES})
