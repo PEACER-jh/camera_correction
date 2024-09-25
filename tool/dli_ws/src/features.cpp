@@ -43,8 +43,8 @@ void computeFeatures_ORB(const cv::Mat& l, const cv::Mat& r)
                                     {return m1.distance < m2.distance;});
     double min = min_max.first->distance;
     double max = min_max.second->distance;
-    printf("    Min distance = %lf \n", min);
-    printf("    Max distance = %lf \n", max);
+    // printf("    Min distance = %lf \n", min);
+    // printf("    Max distance = %lf \n", max);
     //当描述子之间的距离大于两倍的最小距离时，即认为匹配有误
 	//但有时最小距离会非常小，所以设置一个30经验值为下限
     int count = 0;

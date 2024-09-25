@@ -32,6 +32,10 @@ int main()
             std::cout << "Error reading frame!" << std::endl;
             return -2;
         }
+
+        cv::namedWindow("Display window", cv::WINDOW_NORMAL);
+        cv::imshow("Display window", frame);
+
         int rows = frame.rows;
         int cols = frame.cols;
         cv::Mat src(rows, cols, CV_8UC3) ,dst(rows, cols, CV_8UC3);

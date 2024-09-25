@@ -23,44 +23,44 @@
 #include "rmos_interfaces/srv/camera_info.hpp"
 #include "daheng.hpp"
 
+ni wan nm
+
 namespace rmos_camera
 {
-
 class CameraNode : public rclcpp::Node
 {
-public:
-    // CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options);
-    CameraNode(const rclcpp::NodeOptions & options);
-    ~CameraNode();
+ public:
+  // CameraNode(const std::string & node_name, const rclcpp::NodeOptions & options);
+  CameraNode(const rclcpp::NodeOptions& options);
+  ~CameraNode();
 
-private:
-    image_transport::CameraPublisher img_pub_;
-    sensor_msgs::msg::CameraInfo camera_info_;
-    sensor_msgs::msg::Image::SharedPtr img_msg_;
-    rmos_interfaces::msg::CameraInfo camera_info_msg_;
-    // std_msgs::msg::Int32 exp_msg;
-    
-    cv::Mat image_;
-    uint32_t frame_id_;
-    int time_offset;
-    std::thread capture_thread_;
-    std::shared_ptr<rmos_camera::DahengCamera> camera_;
-    std::unique_ptr<camera_info_manager::CameraInfoManager> cam_info_manager_;  
-    OnSetParametersCallbackHandle::SharedPtr callback_handle_;
+ private:
+  image_transport::CameraPublisher img_pub_;
+  sensor_msgs::msg::CameraInfo camera_info_;
+  sensor_msgs::msg::Image::SharedPtr img_msg_;
+  rmos_interfaces::msg::CameraInfo camera_info_msg_;
+  // std_msgs::msg::Int32 exp_msg;
 
-public:
-    rcl_interfaces::msg::SetParametersResult ParamtersCallBack(const std::vector<rclcpp::Parameter> & param);
-    rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
-    rclcpp::Publisher<rmos_interfaces::msg::CameraInfo>::SharedPtr camera_exp_info_pub_;
-    rclcpp::Service<rmos_interfaces::srv::CameraInfo>::SharedPtr camera_exp_info_srv_;
+  cv::Mat image_;
+  uint32_t frame_id_;
+  int time_offset;
+  std::thread capture_thread_;
+  std::shared_ptr<rmos_camera::DahengCamera> camera_;
+  std::unique_ptr<camera_info_manager::CameraInfoManager> cam_info_manager_;
+  OnSetParametersCallbackHandle::SharedPtr callback_handle_;
 
-private:
-    void capture_thread_lambda();
-    void AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv::CameraInfo::Request> request,
-                                    std::shared_ptr<rmos_interfaces::srv::CameraInfo::Response> response);
+ public:
+  rcl_interfaces::msg::SetParametersResult ParamtersCallBack(const std::vector<rclcpp::Parameter>& param);
+  rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_pub_;
+  rclcpp::Publisher<rmos_interfaces::msg::CameraInfo>::SharedPtr camera_exp_info_pub_;
+  rclcpp::Service<rmos_interfaces::srv::CameraInfo>::SharedPtr camera_exp_info_srv_;
 
+ private:
+  void capture_thread_lambda();
+  void AutoExposureCallBack(const std::shared_ptr<rmos_interfaces::srv::CameraInfo::Request> request,
+                            std::shared_ptr<rmos_interfaces::srv::CameraInfo::Response> response);
 };
 
-}
+}  // namespace rmos_camera
 
-#endif // SENSOR_NODE_HPP_
+#endif  // SENSOR_NODE_HPP_
